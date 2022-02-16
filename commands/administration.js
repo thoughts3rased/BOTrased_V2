@@ -1,16 +1,16 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-import ban from './administration/ban.js';
-import clear from './administration/clear.js';
-import kick from './administration/kick.js';
-import modlog from './administration/kick.js';
-import nickname from './administration/nickname.js';
-import warn from './administration/warn.js';
+const { ban }  = require('./administration/ban.js');
+const { clear } = require('./administration/clear.js');
+const { kick } = require('./administration/kick.js');
+const { modlog } = require('./administration/modlog.js');
+const { nickname } = require('./administration/nickname.js');
+const { warn } = require('./administration/warn.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('administration')
         .setDescription('Holds all server administration related commands')
-        .addSubCommand(subcommand =>
+        .addSubcommand(subcommand =>
             subcommand
                 .setName("ban")
                 .setDescription('Bans a user and sends a message in DMs. Requires "Ban Members" permission.')
@@ -24,7 +24,7 @@ module.exports = {
                         .setName("reason")
                         .setDescription("The reason for banning this user.")
                         .setRequired(false)))
-        .addSubCommand(subcommand =>
+        .addSubcommand(subcommand =>
             subcommand
                 .setName('kick')
                 .setDescription('Kicks a user and sends a message in DMs. Requires "Kick Members" permission.')
@@ -32,13 +32,16 @@ module.exports = {
                     option
                     .setName("target")
                     .setDescription("The user who you want to kick.")
-                    .setRequired(true))
+                    .setRequired(true)
+                )
                 .addStringOption(option =>
                     option
                     .setName("reason")
                     .setDescription("The reason for kicking this user.")
-                    .setRequired(false)))
-        .addSubCommand(subcommand =>
+                    .setRequired(false)
+                    )
+                )
+        .addSubcommand(subcommand =>
             subcommand
                 .setName('warn')
                 .setDescription('Warns a user with a message in DMs. Requires "Kick Members" permission.')
@@ -51,8 +54,8 @@ module.exports = {
                     option
                     .setName("reason")
                     .setDescription("The reason for warning this user.")
-                    .setRequired(false))
-        .addSubCommand(subcommand =>
+                    .setRequired(false)))
+        .addSubcommand(subcommand =>
             subcommand
                 .setName('clear')
                 .setDescription('Clear a specific amount of messages in a specified channel.')
@@ -62,8 +65,8 @@ module.exports = {
                         .setRequired(true))
                 .addChannelOption(option =>
                     option.setName('targetchannel')
-                        .setDescription('The channel that you want to clear messages in.'))))
-        .addSubCommand(subcommand =>
+                        .setDescription('The channel that you want to clear messages in.')))
+        .addSubcommand(subcommand =>
             subcommand
                 .setName('nickname')
                 .setDescription('Change a member\'s nickname.')
@@ -75,7 +78,7 @@ module.exports = {
                     option.setName("newnickname")
                         .setDescription("The nickname you want to give to the user.")
                         .setRequired(true)))
-        .addSubCommand(subcommand =>
+        .addSubcommand(subcommand =>
             subcommand
                 .setName('modlog')
                 .setDescription('Check the log of all the actions performed with BOTrased')

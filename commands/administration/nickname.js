@@ -1,6 +1,6 @@
 const { Permissions } = require('discord.js')
 
-export async function nickname(interaction) {
+async function nickname(interaction) {
     //guild members are required to have the "Manage Nicknames" permission in order to use this command
     if (!interaction.member.permissions.has(Permissions.FLAGS.MANAGE_NICKNAMES)){
         return await interaction.reply("You do not have the appropriate permissions to use this command.")
@@ -21,3 +21,5 @@ export async function nickname(interaction) {
         interaction.followUp("There was an issue recording the action in the database.")
     })
 };
+
+module.exports = { nickname };

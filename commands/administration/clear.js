@@ -1,6 +1,6 @@
 const { Permissions, Message } = require('discord.js');
 
-export async function clear(interaction) {
+async function clear(interaction) {
     //Check if the user has the appropriate permissions to use the command
     if (!interaction.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)){
         return await interaction.reply({content: "You do not have the appropriate permission to use that command.", ephemeral: true})
@@ -33,3 +33,5 @@ export async function clear(interaction) {
         })
     })
 };
+
+module.exports = { clear };

@@ -1,6 +1,6 @@
 const { Permissions, MessageEmbed } = require('discord.js')
 
-export async function execute(interaction) {
+async function warn(interaction) {
     if(!interaction.member.permissions.has(Permissions.FLAGS.KICK_MEMBERS, true)){
         return await interaction.reply("You do not have the appropriate permissions to use this command.");
     };
@@ -41,3 +41,5 @@ export async function execute(interaction) {
         await interaction.followUp(`Error creating log entry. Case not recorded.`);
     };
 };
+
+module.exports = { warn };

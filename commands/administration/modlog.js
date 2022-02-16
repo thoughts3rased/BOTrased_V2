@@ -1,8 +1,7 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed, MessageButton, Permissions } = require('discord.js');
 const paginationEmbed = require('discordjs-button-pagination');
 
-export async function modlog(interaction) {
+async function modlog(interaction) {
     //Check to see if the user has the appropriate permissions for this command
     if (!interaction.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)){
         return await interaction.reply({content: "You do not have the appropriate permission to use that command.", ephemeral: true})
@@ -97,3 +96,5 @@ export async function modlog(interaction) {
 
     paginationEmbed(interaction, pages, buttonList)
 };
+
+module.exports = { modlog };
