@@ -5,6 +5,7 @@ const Sequelize = require('sequelize');
 const { Client , Collection, Intents, Permissions } = require("discord.js");
 const io = require('@pm2/io')
 const { AutoPoster } = require('topgg-autoposter');
+const sequelize = require('sequelize');
 
 
 const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
@@ -12,7 +13,7 @@ global.errorCount = 0
 
 const poster = AutoPoster(process.env.TOPGG_TOKEN, client)
 
-global.sequelize = new Sequelize(process.env.DATABASE_SCHEMA, process.env.DATABASE_USERNAME, process.env.DATABASE_PASSWORD, {
+global.database = new Sequelize(process.env.DATABASE_SCHEMA, process.env.DATABASE_USERNAME, process.env.DATABASE_PASSWORD, {
     host: 'thoughts3rased.moe',
     port: 1273,
     dialect: "mysql",
@@ -41,7 +42,7 @@ const messagesPerMinute = io.meter({
     unit: " messages"
 })
 
-global.userRecords = sequelize.define('users', {
+global.userRecords = database.define('users', {
     userID: {
         type: Sequelize.CHAR(18),
         primaryKey: true,
@@ -79,7 +80,7 @@ global.userRecords = sequelize.define('users', {
     timestamps: false
 })
 
-global.serverRecords = sequelize.define('servers', {
+global.serverRecords = database.define('servers', {
     serverID: {
         type: Sequelize.CHAR(18),
         primaryKey: true,
@@ -93,7 +94,7 @@ global.serverRecords = sequelize.define('servers', {
     timestamps:false
 })
 
-global.adminlogRecords = sequelize.define('adminlogs', {
+global.adminlogRecords = database.define('adminlogs', {
     logID: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -128,7 +129,7 @@ global.adminlogRecords = sequelize.define('adminlogs', {
     timestamps: false
 })
 
-global.inventoryRecords = sequelize.define('inventory', {
+global.inventoryRecords = database.define('inventory', {
     userID: {
         type: Sequelize.CHAR(18),
         allowNull: false,
@@ -149,7 +150,7 @@ global.inventoryRecords = sequelize.define('inventory', {
     freezeTableName: true
 })
 
-global.itemRecords = sequelize.define('items', {
+global.itemRecords = database.define('items', {
     itemID: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -179,7 +180,7 @@ global.itemRecords = sequelize.define('items', {
     timestamps: false
 })
 
-global.commandRecords = sequelize.define('commandusage', {
+global.commandRecords = database.define('commandusage', {
     command: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -193,11 +194,134 @@ global.commandRecords = sequelize.define('commandusage', {
     timestamps: false
 })
 
+global.cardRecords = database.define('cards', {
+    cardID: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        primaryKey: true
+    },
+    name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+    group: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    collection: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    imgLink: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    hp: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    defense: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    speed: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    attack: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    description: {
+        type: Sequelize.STRING,
+        allowNull: false
+    }
+}, {timestamps: false})
+
+global.moveRecords = database.define('moves', {
+    moveID: {
+        type: Sequelize.INTEGER,
+        primaryKey: true
+    },
+    name: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    description: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    power: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    turnCooldown: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    type: {
+        type: Sequelize.STRING,
+        allowNull: false
+    }
+}, {timestamps: false})
+
+global.cardMoves = database.define('cardmoves', {
+    cardID: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        primaryKey: true
+    },
+    moveID: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        primaryKey: true
+    }
+}, {timestamps: false})
+
+global.cardInventory = database.define('cardinventory', {
+    userID: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    cardID: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    quantity: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    isActive: {
+
+        type: Sequelize.TINYINT,
+        allowNull: false
+    },
+    deckPosition: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    rarity: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    }
+}, {timestamps: false,
+    freezeTableName: true})
+
 //Setting up DB table relations
 userRecords.hasMany(inventoryRecords, {foreignKey: 'userID'})
+userRecords.hasMany(cardInventory, {foreignKey: 'userID'})
 inventoryRecords.belongsTo(userRecords, {foreignKey: 'userID'})
 inventoryRecords.belongsTo(itemRecords, {foreignKey: 'itemID'})
-itemRecords.hasOne(inventoryRecords, {foreignKey: 'itemID'})
+itemRecords.hasMany(inventoryRecords, {foreignKey: 'itemID'})
+cardRecords.hasMany(cardMoves, {foreignKey: 'cardID'})
+cardMoves.belongsTo(cardRecords, {foreignKey: 'cardID'})
+cardRecords.hasMany(cardInventory, {foreignKey: 'cardID'})
+cardInventory.belongsTo(cardRecords, {foreignKey: 'cardID'})
+cardInventory.belongsTo(userRecords, {foreignKey: 'userID'})
+moveRecords.hasMany(cardMoves, {foreignKey: 'moveID'})
+cardMoves.belongsTo(moveRecords, {foreignKey: 'moveID'})
+
+
 
 client.commands = new Collection();
 
@@ -225,6 +349,14 @@ client.once('ready', () => {
     console.log("Item table synced and online.")
     commandRecords.sync()
     console.log("Command Usage table synced and online.")
+    cardRecords.sync()
+    console.log("Card table synced and online.")
+    cardInventory.sync()
+    console.log("Card inventory table synced and online.")
+    cardMoves.sync()
+    console.log("Card moves table synced and online.")
+    moveRecords.sync()
+    console.log("Move table synced and online.")
     console.log(`Ready. Logged in as ${client.user.username}`)
     
     //set status showing that the bot has finished booting
