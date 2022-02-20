@@ -1,0 +1,11 @@
+Changelog for XX/02/2022 - V 2.5.1
+
+**__SILENT CHANGES__**:
++ General code housekeeping
+
+**__COMMAND CHANGES__**:
++ /administration command group added
+- /ban, /kick, /warn, /clear, /modlog and /nickname have all been moved to the /administration group as subcommands
+
+**__BUG FIXES__**:
++ The error handler will no longer cause an uncaught exception if trying to display an error message on an interaction that has already been replied to
