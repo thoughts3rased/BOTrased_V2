@@ -24,7 +24,6 @@ module.exports = {
             })
             
         })
-        console.log(inventoryData)
         if (!inventoryData) {
             return await interaction.reply("Your inventory is empty.")
         }
