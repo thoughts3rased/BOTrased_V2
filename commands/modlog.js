@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed, MessageButton, Permissions } = require('discord.js');
-const paginationEmbed = require('discordjs-button-pagination');
+const { handleEmbedPagination } = require('../functions/handleEmbedPagination');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -97,17 +97,7 @@ module.exports = {
             }
             pages.push(currentPage)    
         }
-        buttonList = [
-            new MessageButton()
-                .setCustomId('previousbtn')
-                .setLabel('Previous Page')
-                .setStyle('DANGER'),
-            new MessageButton()
-                .setCustomId('nextbtn')
-                .setLabel('Next Page')
-                .setStyle('SUCCESS')
-        ]
 
-        paginationEmbed(interaction, pages, buttonList)
+        await handleEmbedPagination(interaction, pages);
     },
 };
