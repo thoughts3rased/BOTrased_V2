@@ -6,6 +6,11 @@ const { Client , Collection, Intents, Permissions } = require("discord.js");
 const io = require('@pm2/io')
 const { AutoPoster } = require('topgg-autoposter');
 const sequelize = require('sequelize');
+const { serversObject } = require('./databaseObjects/servers.js');
+const { adminLogObject } = require('./databaseObjects/adminLogs.js');
+const { usersObject } = require('./databaseObjects/users.js');
+const { inventoryObject } = require('./databaseObjects/inventory.js');
+const { itemsObject } = require('./databaseObjects/items.js');
 
 
 const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
@@ -42,143 +47,15 @@ const messagesPerMinute = io.meter({
     unit: " messages"
 })
 
-global.userRecords = database.define('users', {
-    userID: {
-        type: Sequelize.CHAR(18),
-        primaryKey: true,
-        allowNull: false
-    },
-    exp: {
-        type: Sequelize.BIGINT.UNSIGNED,
-        defaultValue: 0
-    },
-    level: {
-        type: Sequelize.BIGINT.UNSIGNED,
-        defaultValue: 0
-    },
-    money: {
-        type: Sequelize.BIGINT.UNSIGNED,
-        defaultValue: 0
-    },
-    message: {
-        type: Sequelize.STRING(144),
-        defaultValue: null
-    },
-    levelUpMessage: {
-        type: Sequelize.TINYINT(1),
-        defaultValue: 1
-    },
-    lastdaily: {
-        type: Sequelize.BIGINT.UNSIGNED,
-        defaultValue: null
-    },
-    embedColour: {
-        type: Sequelize.CHAR(6),
-        defaultValue: null
-    }
-}, {
-    timestamps: false
-})
+global.userRecords = usersObject
 
-global.serverRecords = database.define('servers', {
-    serverID: {
-        type: Sequelize.CHAR(18),
-        primaryKey: true,
-        allowNull: false
-    },
-    levelUpMessage: {
-        type: Sequelize.TINYINT(1),
-        defaultValue: 1
-    }
-}, {
-    timestamps:false
-})
+global.serverRecords = serversObject;
 
-global.adminlogRecords = database.define('adminlogs', {
-    logID: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    serverID: {
-        type: Sequelize.CHAR(18)
-    },
-    recipientID: {
-        type: Sequelize.CHAR(18)
-    },
-    adminID: {
-        type: Sequelize.CHAR(18)
-    },
-    type: {
-        type: Sequelize.STRING(15),
-        isIn: [['warn', 'ban', 'kick', 'clear', 'name']],
-        allowNull: false
-    },
-    reason: {
-        type: Sequelize.STRING(240),
-        defaultValue: null
-    },
-    time: {
-        type: Sequelize.BIGINT
-    },
-    botUsed: {
-        type: Sequelize.TINYINT(1)
-    }
+global.adminlogRecords = adminLogObject;
 
-}, {
-    timestamps: false
-})
+global.inventoryRecords = inventoryObject;
 
-global.inventoryRecords = database.define('inventory', {
-    userID: {
-        type: Sequelize.CHAR(18),
-        allowNull: false,
-        primaryKey: true
-    },
-    itemID: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        primaryKey: true
-    },
-    showOnProfile: {
-        type: Sequelize.TINYINT(1),
-        allowNull: false,
-        defaultValue: 0
-    }
-}, {
-    timestamps: false,
-    freezeTableName: true
-})
-
-global.itemRecords = database.define('items', {
-    itemID: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    type: {
-        type: Sequelize.STRING(45)
-    },
-    name: {
-        type: Sequelize.STRING(45)
-    },
-    emojiString: {
-        type: Sequelize.STRING(80)
-    },
-    price: {
-        type: Sequelize.INTEGER
-    },
-    description: {
-        type: Sequelize.STRING(240)
-    },
-    purchasable: {
-        type: Sequelize.TINYINT(1),
-        defaultValue: 1
-    }
-}, {
-    timestamps: false
-})
+global.itemRecords = itemsObject;
 
 global.commandRecords = database.define('commandusage', {
     command: {
@@ -366,10 +243,8 @@ client.once('ready', () => {
         //these are the status messages that the bot will randomly pick from and cycle through
         const statusMessages = [
             "Now in JavaScript!",
-            "Living to fight another day.",
             "Prefixes be gone!",
             "Peek at my insides on github!",
-            "Now supports slash commands!",
             `Currently serving ${client.guilds.cache.size} servers!`,
             "No help command required.",
             "Bleep-bloop-blop",

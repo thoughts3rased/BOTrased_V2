@@ -2,16 +2,17 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { getCardMoveSet } = require('../../functions/getCardMoveSet.js');
 const { handleEmbedPagination } = require('../../functions/handleEmbedPagination.js');
+const { Card } = require('../../models/Card.js');
 
 
 async function lookup(interaction){
     await interaction.deferReply()
-    const targetCard = await cardRecords.findOne({where: {cardID: interaction.options.getInteger('cardid')}})
-    if (!targetCard){
+    const targetCard = new Card(interaction.options.getInteger('cardid'))
+    if (!targetCard.fulfilled){
         return await interaction.editReply(":x:A card with this ID does not exist.")
     }
     const cardInfoEmbed = new MessageEmbed()
-            .setTitle(`#${targetCard.get('cardID')} - ${targetCard.get('name')} (${targetCard.get('hp')}HP)`)
+            .setTitle(`#${targetCard.ID} - ${targetCard.name} (${targetCard.hp}HP)`)
             .setDescription(`*The ${targetCard.get('collection')} collection*\n*"${targetCard.get('description')}"*`)
             .setImage(targetCard.get('imgLink'))
             .addFields(
